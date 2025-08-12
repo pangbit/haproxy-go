@@ -74,18 +74,14 @@ func (a *Agent) Serve(l net.Listener) error {
 }
 
 func wrapPanic(fn func() error) (err error) {
-	didPanic := true
 	defer func() {
-		if didPanic {
-			if e := recover(); e != nil {
-				const size = 64 << 10
-				buf := make([]byte, size)
-				buf = buf[:runtime.Stack(buf, false)]
-				err = fmt.Errorf("spop: panic: %v\n%s", e, buf)
-			}
+		if e := recover(); e != nil {
+			const size = 64 << 10
+			buf := make([]byte, size)
+			buf = buf[:runtime.Stack(buf, false)]
+			err = fmt.Errorf("spop: panic: %v\n%s", e, buf)
 		}
 	}()
 	err = fn()
-	didPanic = false
 	return
 }
