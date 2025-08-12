@@ -50,7 +50,8 @@ type frame struct {
 }
 
 func (f *frame) ReadFrom(r io.Reader) (int64, error) {
-	if _, err := r.Read(f.length); err != nil {
+	// Read frame length
+	if _, err := io.ReadFull(r, f.length); err != nil {
 		return 0, fmt.Errorf("reading frame length: %w", err)
 	}
 	frameLen := binary.BigEndian.Uint32(f.length)
@@ -58,14 +59,10 @@ func (f *frame) ReadFrom(r io.Reader) (int64, error) {
 	f.buf.Reset()
 	dataBuf := f.buf.WriteNBytes(int(frameLen))
 
-	// read full frame into buffer
-	n, err := r.Read(dataBuf)
+	// Read full frame payload
+	n, err := io.ReadFull(r, dataBuf)
 	if err != nil {
 		return int64(n + len(f.length)), fmt.Errorf("reading frame payload: %w", err)
-	}
-
-	if n != int(frameLen) {
-		return int64(n + len(f.length)), io.ErrUnexpectedEOF
 	}
 
 	return int64(n + len(f.length)), f.decodeHeader()

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math"
 	"net"
 	"runtime"
 )
@@ -50,11 +49,12 @@ func (a *Agent) Serve(l net.Listener) error {
 		}
 
 		if tcp, ok := nc.(*net.TCPConn); ok {
-			err = tcp.SetWriteBuffer(math.MaxUint16) // 64KB seems like a fair buffer size
-			if err != nil {
-				return err
-			}
-			err = tcp.SetReadBuffer(math.MaxUint16) // 64KB seems like a fair buffer size
+			// 使用系统默认
+			// err = tcp.SetWriteBuffer(math.MaxUint16) // 64KB seems like a fair buffer size
+			// if err != nil {
+			// 	return err
+			// }
+			err = tcp.SetReadBuffer(256 * 1024) // 256KB seems like a fair buffer size
 			if err != nil {
 				return err
 			}

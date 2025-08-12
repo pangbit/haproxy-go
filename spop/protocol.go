@@ -88,7 +88,7 @@ const (
 
 	// maxFrameSize represents the maximum frame size allowed by this library
 	// it also represents the maximum slice size that is allowed on stack
-	maxFrameSize = 64<<10 - 1
+	maxFrameSize = 10 * 1024 * 1024 // 10MB
 )
 
 func (c *protocolClient) onHAProxyHello(f *frame) error {
